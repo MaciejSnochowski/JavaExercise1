@@ -1,60 +1,50 @@
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    static int counter=0;
+    static void countHowManyLines(FileReader fileReader) throws IOException {
+         BufferedReader bufferedReader = new BufferedReader(fileReader);
+         while(bufferedReader.readLine()!=null){
+             counter++;
+         }
+    }
+    static int howManyLines(){
+         return counter ;
+    }
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+      int threads =Integer.parseInt(args[0]);
+
+        //Deklaracja list do przechowywania obiektów
         ArrayList<Read> ReadArrayList= new ArrayList<Read>();
-        ArrayList<Future<String>> ReadArrayListFuture= new ArrayList<Future<String>>();
 
-        ArrayList<Do> doArrayList= new ArrayList<Do>();
-        ArrayList<Future<Integer>> doArrayListFuture= new ArrayList<Future<Integer>>();
-        ExecutorService exec = Executors.newFixedThreadPool(2);
-        for (int i = 0; i <10 ; i++) {
-          //  doArrayList.add(new Do(i));
-            ReadArrayList.add(new Read(new FileReader("src/File.txt")));
+        ArrayList<Future<String>> FutureArrayList= new ArrayList<>();
+        //Executor service
+        ExecutorService exec = Executors.newFixedThreadPool(threads);
+        //Odczytywanie pliku aby dowiedzieć się ile ma linii
+        countHowManyLines(new FileReader("src/File.txt"));
+        //howManyLines(); zwraca int z ilością linii w pliku
 
+       //Tworzenie Readerów i dodawanie ich do listy
+        for (int i = 0; i <howManyLines() ; i++) {
+            ReadArrayList.add(new Read(new FileReader("src/File.txt"),howManyLines()));
         }
-//        for (Do dus:doArrayList
-//             ) {
-//            doArrayListFuture.add(exec.submit(dus));
-//
-//        }
-        for (Read rd:ReadArrayList
-        ) {
-            ReadArrayListFuture.add(exec.submit(rd));
+      List<Future<String>> resultList ;
 
-        }
-        try {
-            Thread.sleep(10000);
-        }catch (InterruptedException E){
-            E.printStackTrace();
-        }
+        //Wysyłanie listy z obiektami Callable do executora
+       resultList=exec.invokeAll(ReadArrayList);
+
         exec.shutdown();
-        for (Future<String> a:ReadArrayListFuture){
-            String msg="";
-            try{
-                if (a.isCancelled()){
-                    msg+=" zadanie "+a +" Anulowane";
-                } else if (a.isDone()) {
-                    msg+=Thread.currentThread().getId()+" zadanie "+ a+ " wykonane: "+a.get();
+        System.out.println("wielkosc listy "+resultList.size());
+        for (int i = 0; i <resultList.size() ; i++) {
+            System.out.println(resultList.get(i).get(7,TimeUnit.SECONDS));
 
-                }else msg+= "zadanie "+ a + " jeszcze nie wykonanne";
-
-
-            }catch (Exception e){
-
-                e.printStackTrace();
-            }
-            System.out.println(msg);
         }
-        System.out.println(" ExecutionService isTerminated: "+ exec.isTerminated());
-        System.out.println( "uruchomiono zadań: "+ doArrayListFuture.size());
-
+        System.out.println(
+                "koniec"
+        );
 
     }
 }
