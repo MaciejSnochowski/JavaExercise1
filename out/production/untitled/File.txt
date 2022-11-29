@@ -8,13 +8,3 @@ to jest 7 linia
 to jest 8 linia
 to jest 9 linia
 to jest 10 linia
-to jest 11 linia
-to jest 12 linia
-to jest 13 linia
-to jest 14 linia
-to jest 15 linia
-to jest 16 linia
-to jest 17 linia
-to jest 18 linia
-to jest 19 linia
-to jest 20 linia

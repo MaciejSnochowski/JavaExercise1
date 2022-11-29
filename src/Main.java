@@ -1,12 +1,8 @@
-import javax.crypto.spec.PSource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.*;
 
-
-//opisac np callable
 public class Main {
     static int counter=0;
     static void countHowManyLines(FileReader fileReader) throws IOException {
@@ -35,34 +31,20 @@ public class Main {
         for (int i = 0; i <howManyLines() ; i++) {
             ReadArrayList.add(new Read(new FileReader("src/File.txt"),howManyLines()));
         }
-      //  List<Future<String>> resultList ;
+      List<Future<String>> resultList ;
 
         //Wysyłanie listy z obiektami Callable do executora
-     //   resultList=exec.invokeAll(ReadArrayList); //prawdopodobnie nie może być ponieważ wszyskie wątki "rzucają się na zmienne"
-        for (Read reader: ReadArrayList //iloś wątków det
-       ) {
+       resultList=exec.invokeAll(ReadArrayList);
 
-           // Thread.sleep(600);
-
-            FutureArrayList.add(exec.submit(reader));
-            //Future<String> ft=exec.submit(reader);
-            // ft.get();
-
-
-        }
         exec.shutdown();
-        System.out.println("wielkosc listy "+FutureArrayList.size());
-        for (int i = 0; i <FutureArrayList.size() ; i++) {
-            System.out.println(FutureArrayList.get(i).get(7,TimeUnit.SECONDS));
+        System.out.println("wielkosc listy "+resultList.size());
+        for (int i = 0; i <resultList.size() ; i++) {
+            System.out.println(resultList.get(i).get(7,TimeUnit.SECONDS));
 
         }
         System.out.println(
                 "koniec"
         );
-
-
-
-
 
     }
 }
